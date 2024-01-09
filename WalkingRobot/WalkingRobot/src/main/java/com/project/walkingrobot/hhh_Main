@@ -1,0 +1,24 @@
+ private void updateFloorGrid() {
+        int size = floorGrid.getRowCount();
+        floorGrid.getChildren().clear();
+
+        for (int row = size - 1; row >= 0; row--) {
+            for (int col = 0; col < size; col++) {
+                int cellValue = floor.getCell(col, size - 1 - row); // Adjusted row index
+                Rectangle rectangle = new Rectangle(30, 30);
+                rectangle.setStroke(Color.BLACK);
+
+                if (row == robot.getY() && col == robot.getX()) {
+                    rectangle.setFill(Color.RED);
+                } else if (robot.isPenDown() && cellValue == 1) {
+                    tracedPathPositions.add(new int[]{col, size - 1 - row});
+                    rectangle.setFill(Color.WHITE);
+                } else {
+                    rectangle.setFill(Color.WHITE);
+                }
+
+                floorGrid.add(rectangle, col, size - 1 - row); // Adjusted row index
+            }
+        }
+        //resetTracedPath();
+    }

@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Main.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">WalkingRobot</a> &gt; <a href="index.source.html" class="el_package">com.project.walkingrobot</a> &gt; <span class="el_source">Main.java</span></div><h1>Main.java</h1><pre class="source lang-java linenums">package com.project.walkingrobot;
+
+import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.RowConstraints;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.stage.Stage;
+
+import java.util.ArrayList;
+import java.util.List;
+
+<span class="fc" id="L22">public class Main extends Application {</span>
+
+    private Robot robot;
+    private Floor floor;
+    private Label positionLabel;
+    private GridPane floorGrid;
+    private TextField commandTextField;
+    private boolean displayTracedPath;
+<span class="fc" id="L30">    private final List&lt;int[]&gt; tracedPathPositions = new ArrayList&lt;&gt;();</span>
+
+
+    public static void main(String[] args) {
+<span class="nc" id="L34">        launch(args);</span>
+<span class="nc" id="L35">    }</span>
+
+    @Override
+    public void start(Stage primaryStage) {
+<span class="fc" id="L39">        robot = null;</span>
+<span class="fc" id="L40">        floor = null;</span>
+
+<span class="fc" id="L42">        primaryStage.setTitle(&quot;Robot Simulator&quot;);</span>
+
+<span class="fc" id="L44">        GridPane gridPane = new GridPane();</span>
+<span class="fc" id="L45">        gridPane.setAlignment(Pos.CENTER);</span>
+<span class="fc" id="L46">        gridPane.setHgap(10);</span>
+<span class="fc" id="L47">        gridPane.setVgap(10);</span>
+<span class="fc" id="L48">        gridPane.setPadding(new Insets(10));</span>
+
+<span class="fc" id="L50">        Label commandLabel = new Label(&quot;Enter Command:&quot;);</span>
+<span class="fc" id="L51">        commandTextField = new TextField();</span>
+
+<span class="fc" id="L53">        Button executeButton = new Button(&quot;Execute&quot;);</span>
+<span class="pc" id="L54">        executeButton.setOnAction(event -&gt; executeCommand(&quot;Q&quot;, false));</span>
+
+<span class="fc" id="L56">        positionLabel = new Label(&quot;Position: -\nPen: -\nFacing: -&quot;);</span>
+
+<span class="fc" id="L58">        floorGrid = new GridPane();</span>
+<span class="fc" id="L59">        floorGrid.setId(&quot;floorGrid&quot;);</span>
+<span class="fc" id="L60">        floorGrid.setAlignment(Pos.CENTER);</span>
+<span class="fc" id="L61">        floorGrid.setHgap(2);</span>
+<span class="fc" id="L62">        floorGrid.setVgap(2);</span>
+
+<span class="fc" id="L64">        gridPane.add(positionLabel, 0, 0, 1, 2);</span>
+<span class="fc" id="L65">        gridPane.add(commandLabel, 0, 2);</span>
+<span class="fc" id="L66">        gridPane.add(commandTextField, 1, 2);</span>
+<span class="fc" id="L67">        gridPane.add(executeButton, 2, 2);</span>
+<span class="fc" id="L68">        gridPane.add(floorGrid, 0, 3, 3, 1);</span>
+
+<span class="fc" id="L70">        Scene scene = new Scene(gridPane, 400, 300);</span>
+<span class="fc" id="L71">        primaryStage.setScene(scene);</span>
+<span class="fc" id="L72">        primaryStage.show();</span>
+<span class="fc" id="L73">    }</span>
+
+    public void initializeFloorGrid(int size) {
+<span class="fc" id="L76">        floorGrid.getChildren().clear();</span>
+<span class="fc" id="L77">        floorGrid.getColumnConstraints().clear();</span>
+<span class="fc" id="L78">        floorGrid.getRowConstraints().clear();</span>
+
+<span class="fc bfc" id="L80" title="All 2 branches covered.">        for (int row = size - 1; row &gt;= 0; row--) {</span>
+<span class="fc" id="L81">            RowConstraints rowConstraints = new RowConstraints();</span>
+<span class="fc" id="L82">            rowConstraints.setVgrow(Priority.ALWAYS);</span>
+<span class="fc" id="L83">            floorGrid.getRowConstraints().add(rowConstraints);</span>
+
+<span class="fc bfc" id="L85" title="All 2 branches covered.">            for (int col = 0; col &lt; size; col++) {</span>
+<span class="fc" id="L86">                ColumnConstraints colConstraints = new ColumnConstraints();</span>
+<span class="fc" id="L87">                colConstraints.setHgrow(Priority.ALWAYS);</span>
+<span class="fc" id="L88">                floorGrid.getColumnConstraints().add(colConstraints);</span>
+
+<span class="fc" id="L90">                Rectangle rectangle = new Rectangle(30, 30);</span>
+<span class="fc" id="L91">                rectangle.setFill(Color.WHITE);</span>
+<span class="fc" id="L92">                rectangle.setStroke(Color.BLACK);</span>
+
+<span class="fc bfc" id="L94" title="All 4 branches covered.">                if (row == size - 1 &amp;&amp; col == 0) {</span>
+<span class="fc" id="L95">                    rectangle.setFill(Color.RED); // Starting position</span>
+                }
+
+<span class="fc" id="L98">                floorGrid.add(rectangle, col, row);</span>
+            }
+        }
+<span class="fc" id="L101">    }</span>
+
+    public boolean executeCommand(String testInput, boolean isTesting) {
+        String input;
+<span class="pc bpc" id="L105" title="1 of 2 branches missed.">        if(isTesting){</span>
+<span class="fc" id="L106">            input = testInput;</span>
+        } else {
+<span class="nc" id="L108">            input = commandTextField.getText().trim();</span>
+        }
+<span class="fc" id="L110">        String[] command = input.split(&quot; &quot;);</span>
+<span class="fc" id="L111">        String cmd = command[0];</span>
+
+<span class="fc bfc" id="L113" title="All 2 branches covered.">        if (cmd.equalsIgnoreCase(&quot;Q&quot;)) {</span>
+<span class="fc" id="L114">            resetTracedPath();</span>
+<span class="fc" id="L115">            System.out.println(&quot;End of program.&quot;);</span>
+<span class="fc" id="L116">            return true; // Terminate the program</span>
+        }
+
+<span class="fc" id="L119">        Platform.runLater(() -&gt; {</span>
+<span class="fc bfc" id="L120" title="All 2 branches covered.">            if (cmd.equalsIgnoreCase(&quot;I&quot;)) {</span>
+<span class="fc" id="L121">                int size = Integer.parseInt(command[1]);</span>
+<span class="fc" id="L122">                floor = new Floor(size);</span>
+<span class="fc" id="L123">                robot = new Robot();</span>
+<span class="fc" id="L124">                updatePositionLabel();</span>
+<span class="fc" id="L125">                initializeFloorGrid(size);</span>
+<span class="pc bpc" id="L126" title="1 of 2 branches missed.">            } else if (cmd.equalsIgnoreCase(&quot;C&quot;)) {</span>
+<span class="nc bnc" id="L127" title="All 2 branches missed.">                if (robot != null) {</span>
+<span class="nc" id="L128">                    updatePositionLabel();</span>
+                } else {
+<span class="nc" id="L130">                    System.out.println(&quot;Please initialize the system first!&quot;);</span>
+                }
+<span class="fc bfc" id="L132" title="All 2 branches covered.">            } else if (cmd.equalsIgnoreCase(&quot;U&quot;)) {</span>
+<span class="pc bpc" id="L133" title="1 of 2 branches missed.">                if (robot != null) {</span>
+<span class="fc" id="L134">                    robot.setPenDown(false);</span>
+<span class="fc" id="L135">                    updatePositionLabel();</span>
+                } else {
+<span class="nc" id="L137">                    System.out.println(&quot;Please initialize the system first!&quot;);</span>
+                }
+<span class="fc bfc" id="L139" title="All 2 branches covered.">            } else if (cmd.equalsIgnoreCase(&quot;D&quot;)) {</span>
+<span class="pc bpc" id="L140" title="1 of 2 branches missed.">                if (robot != null) {</span>
+<span class="fc" id="L141">                    robot.setPenDown(true);</span>
+<span class="fc" id="L142">                    updatePositionLabel();</span>
+                } else {
+<span class="nc" id="L144">                    System.out.println(&quot;Please initialize the system first!&quot;);</span>
+                }
+<span class="fc bfc" id="L146" title="All 2 branches covered.">            } else if (cmd.equalsIgnoreCase(&quot;R&quot;)) {</span>
+<span class="pc bpc" id="L147" title="1 of 2 branches missed.">                if (robot != null) {</span>
+<span class="fc" id="L148">                    robot.turnRight();</span>
+<span class="fc" id="L149">                    updatePositionLabel();</span>
+                } else {
+<span class="nc" id="L151">                    System.out.println(&quot;Please initialize the system first!&quot;);</span>
+                }
+<span class="fc bfc" id="L153" title="All 2 branches covered.">            } else if (cmd.equalsIgnoreCase(&quot;L&quot;)) {</span>
+<span class="pc bpc" id="L154" title="1 of 2 branches missed.">                if (robot != null) {</span>
+<span class="fc" id="L155">                    robot.turnLeft();</span>
+<span class="fc" id="L156">                    updatePositionLabel();</span>
+                } else {
+<span class="nc" id="L158">                    System.out.println(&quot;Please initialize the system first!&quot;);</span>
+                }
+<span class="pc bpc" id="L160" title="1 of 2 branches missed.">            } else if (cmd.equalsIgnoreCase(&quot;M&quot;)) {</span>
+<span class="pc bpc" id="L161" title="1 of 2 branches missed.">                if (robot != null) {</span>
+<span class="fc" id="L162">                    int steps = Integer.parseInt(command[1]);</span>
+<span class="fc" id="L163">                    robot.move(steps, floor);</span>
+<span class="fc" id="L164">                    displayTracedPath = false;</span>
+<span class="fc" id="L165">                    updateFloorGrid();</span>
+<span class="fc" id="L166">                    updatePositionLabel();</span>
+
+                    //System.out.println(&quot;Traced Path Positions for Command M: &quot;);
+<span class="fc" id="L169">                    System.out.println(&quot;Size of Traced Path Positions: &quot; + tracedPathPositions.size());</span>
+                    /*for (int[] position : tracedPathPositions) {
+                        System.out.println(position[0] + &quot;, &quot; + position[1]);
+                    }*/
+<span class="fc" id="L173">                } else {</span>
+<span class="nc" id="L174">                    System.out.println(&quot;Please initialize the system first!&quot;);</span>
+                }
+<span class="nc bnc" id="L176" title="All 2 branches missed.">            } else if (cmd.equalsIgnoreCase(&quot;P&quot;)) {</span>
+<span class="nc bnc" id="L177" title="All 2 branches missed.">                if (floor != null) {</span>
+<span class="nc" id="L178">                    displayTracedPath = true;</span>
+<span class="nc" id="L179">                    fillTracedPath();</span>
+
+                    /*System.out.println(&quot;Traced Path Positions for command P: &quot;);
+                    for (int[] position : tracedPathPositions) {
+                        System.out.println(position[0] + &quot;, &quot; + position[1]);
+                    }*/
+                } else {
+<span class="nc" id="L186">                    System.out.println(&quot;Please initialize the system first!&quot;);</span>
+                }
+<span class="nc bnc" id="L188" title="All 2 branches missed.">            } else if (cmd.equalsIgnoreCase(&quot;Q&quot;)) {</span>
+<span class="nc" id="L189">                resetTracedPath();</span>
+<span class="nc" id="L190">                System.out.println(&quot;End of program.&quot;);</span>
+            } else {
+<span class="nc" id="L192">                System.out.println(&quot;Invalid command. Please try again!&quot;);</span>
+            }
+
+<span class="fc" id="L195">            commandTextField.clear();</span>
+<span class="fc" id="L196">        });</span>
+<span class="fc" id="L197">        return false;</span>
+    }
+
+    private void updateFloorGrid() {
+<span class="pc bpc" id="L201" title="1 of 2 branches missed.">        if (floorGrid != null) {</span>
+<span class="fc" id="L202">            int size = floorGrid.getRowCount();</span>
+<span class="fc" id="L203">            floorGrid.getChildren().clear();</span>
+
+<span class="fc bfc" id="L205" title="All 2 branches covered.">            for (int row = size - 1; row &gt;= 0; row--) {</span>
+<span class="fc bfc" id="L206" title="All 2 branches covered.">                for (int col = 0; col &lt; size; col++) {</span>
+<span class="fc" id="L207">                    int cellValue = floor.getCell(col, size - 1 - row); // Adjusted row index</span>
+<span class="fc" id="L208">                    Rectangle rectangle = new Rectangle(30, 30);</span>
+<span class="fc" id="L209">                    rectangle.setStroke(Color.BLACK);</span>
+
+<span class="fc bfc" id="L211" title="All 4 branches covered.">                    if (row == robot.getY() &amp;&amp; col == robot.getX()) {</span>
+<span class="fc" id="L212">                        rectangle.setFill(Color.RED);</span>
+<span class="pc bpc" id="L213" title="3 of 4 branches missed.">                    } else if (robot.isPenDown() &amp;&amp; cellValue == 1) {</span>
+<span class="nc" id="L214">                        tracedPathPositions.add(new int[]{col, size - 1 - row});</span>
+<span class="nc" id="L215">                        rectangle.setFill(Color.WHITE);</span>
+                    } else {
+<span class="fc" id="L217">                        rectangle.setFill(Color.WHITE);</span>
+                    }
+
+<span class="fc" id="L220">                    floorGrid.add(rectangle, col, size - 1 - row); // Adjusted row index</span>
+
+                    // Print cell value for debugging
+<span class="fc" id="L223">                    System.out.print(cellValue + &quot; &quot;);</span>
+                }
+<span class="fc" id="L225">                System.out.println(); // New line for each row</span>
+            }
+        }
+<span class="fc" id="L228">    }</span>
+
+    private void fillTracedPath() {
+<span class="nc bnc" id="L231" title="All 2 branches missed.">        if (displayTracedPath) {</span>
+<span class="nc bnc" id="L232" title="All 2 branches missed.">            for (int[] position : tracedPathPositions) {</span>
+<span class="nc" id="L233">                int col = position[0];</span>
+<span class="nc" id="L234">                int row = position[1];</span>
+<span class="nc" id="L235">                Rectangle rectangle = new Rectangle(30, 30);</span>
+<span class="nc" id="L236">                rectangle.setStroke(Color.BLACK);</span>
+
+<span class="nc bnc" id="L238" title="All 4 branches missed.">                if (row == robot.getY() &amp;&amp; col == robot.getX()) {</span>
+<span class="nc" id="L239">                    rectangle.setFill(Color.RED);</span>
+                } else {
+<span class="nc" id="L241">                    rectangle.setFill(Color.BLACK);</span>
+                }
+
+<span class="nc" id="L244">                floorGrid.add(rectangle, col, row);</span>
+
+                // Print traced path positions for debugging
+                //System.out.println(&quot;Traced Path Position: &quot; + col + &quot;, &quot; + row);
+<span class="nc" id="L248">            }</span>
+<span class="nc" id="L249">            resetTracedPath();</span>
+        }
+<span class="nc" id="L251">    }</span>
+
+    private void resetTracedPath() {
+<span class="fc" id="L254">        tracedPathPositions.clear();</span>
+<span class="fc" id="L255">    }</span>
+
+    private void updatePositionLabel() {
+<span class="fc bfc" id="L258" title="All 2 branches covered.">        String penStatus = robot.isPenDown() ? &quot;down&quot; : &quot;up&quot;;</span>
+<span class="fc" id="L259">        String positionText = &quot;Position: &quot; + robot.getX() + &quot;, &quot; + robot.getY() +</span>
+<span class="fc" id="L260">                &quot;\nPen: &quot; + penStatus + &quot;\nFacing: &quot; + robot.getDirection();</span>
+<span class="fc" id="L261">        positionLabel.setText(positionText);</span>
+<span class="fc" id="L262">    }</span>
+
+    public Robot getRobot() {
+<span class="fc" id="L265">        return robot;</span>
+    }
+
+    public void setRobot(Robot robot) {
+<span class="nc" id="L269">        this.robot = robot;</span>
+<span class="nc" id="L270">    }</span>
+
+    public Floor getFloor() {
+<span class="fc" id="L273">        return floor;</span>
+    }
+
+    public void setFloor(Floor floor) {
+<span class="nc" id="L277">        this.floor = floor;</span>
+<span class="nc" id="L278">    }</span>
+
+    public Label getPositionLabel() {
+<span class="fc" id="L281">        return positionLabel;</span>
+    }
+
+    public void setPositionLabel(Label positionLabel) {
+<span class="nc" id="L285">        this.positionLabel = positionLabel;</span>
+<span class="nc" id="L286">    }</span>
+
+    public GridPane getFloorGrid() {
+<span class="nc" id="L289">        return floorGrid;</span>
+    }
+
+    public void setFloorGrid(GridPane floorGrid) {
+<span class="nc" id="L293">        this.floorGrid = floorGrid;</span>
+<span class="nc" id="L294">    }</span>
+
+    public TextField getCommandTextField() {
+<span class="fc" id="L297">        return commandTextField;</span>
+    }
+
+    public void setCommandTextField(TextField commandTextField) {
+<span class="nc" id="L301">        this.commandTextField = commandTextField;</span>
+<span class="nc" id="L302">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

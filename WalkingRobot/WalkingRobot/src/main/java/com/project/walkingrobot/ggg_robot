@@ -1,0 +1,36 @@
+public void move(int steps) {
+        if (steps <= 0) {
+            throw new IllegalArgumentException("Invalid number of steps: " + steps);
+        }
+        switch (direction) {
+            case NORTH -> y += steps;
+            case EAST -> x += steps;
+            case SOUTH -> y -= steps;
+            case WEST -> x -= steps;
+        }
+    }
+
+    public void turnRight() {
+        switch (direction) {
+            case NORTH -> direction = Direction.EAST;
+            case EAST -> direction = Direction.SOUTH;
+            case SOUTH -> direction = Direction.WEST;
+            case WEST -> direction = Direction.NORTH;
+        }
+    }
+
+    public void turnLeft() {
+        switch (direction) {
+            case NORTH -> direction = Direction.WEST;
+            case EAST -> direction = Direction.NORTH;
+            case SOUTH -> direction = Direction.EAST;
+            case WEST -> direction = Direction.SOUTH;
+        }
+    }
+
+    public void printPosition() {
+        String penStatus = penDown ? "down" : "up";
+        System.out.println("Position: " + x + ", " + y + " - Pen: " + penStatus + " - Facing: " + direction);
+    }
+
+}

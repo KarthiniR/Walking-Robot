@@ -1,0 +1,27 @@
+ @Test
+    public void testTurnLeftFromNorth() {
+        robot.setDirection(Direction.NORTH);
+        robot.turnLeft();
+        Assertions.assertEquals(Direction.WEST, robot.getDirection());
+    }
+
+    @Test
+    public void testTurnLeftFromWest() {
+        robot.setDirection(Direction.WEST);
+        robot.turnLeft();
+        Assertions.assertEquals(Direction.SOUTH, robot.getDirection());
+    }
+
+    @Test
+    public void testTurnLeftFromSouth() {
+        robot.setDirection(Direction.SOUTH);
+        robot.turnLeft();
+        Assertions.assertEquals(Direction.EAST, robot.getDirection());
+    }
+
+    @Test
+    public void testTurnLeftFromEast() {
+        robot.setDirection(Direction.EAST);
+        robot.turnLeft();
+        Assertions.assertEquals(Direction.NORTH, robot.getDirection());
+    }

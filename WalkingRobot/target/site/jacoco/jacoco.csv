@@ -1,0 +1,5 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+WalkingRobot,com.project.walkingrobot,Floor,6,82,4,10,2,12,5,8,1,5
+WalkingRobot,com.project.walkingrobot,Direction,0,27,0,0,0,2,0,1,0,1
+WalkingRobot,com.project.walkingrobot,Main,180,484,28,40,46,118,28,27,9,12
+WalkingRobot,com.project.walkingrobot,Robot,7,220,5,22,1,56,5,27,0,14
